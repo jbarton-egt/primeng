@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import {
-    AfterContentInit,
     booleanAttribute,
     ChangeDetectionStrategy,
     Component,
@@ -24,15 +23,14 @@ import { uuid } from '@primeuix/utils';
 import { MenuItem, PrimeTemplate, SharedModule, TooltipOptions } from 'primeng/api';
 import { AutoFocus } from 'primeng/autofocus';
 import { BaseComponent, PARENT_INSTANCE } from 'primeng/basecomponent';
+import { Bind } from 'primeng/bind';
 import { ButtonDirective } from 'primeng/button';
 import { ChevronDownIcon } from 'primeng/icons';
 import { Ripple } from 'primeng/ripple';
 import { TieredMenu } from 'primeng/tieredmenu';
 import { TooltipModule } from 'primeng/tooltip';
-import { ButtonProps, MenuButtonProps } from 'primeng/types/splitbutton';
+import { ButtonProps, MenuButtonProps, SplitButtonPassThrough } from 'primeng/types/splitbutton';
 import { SplitButtonStyle } from './style/splitbuttonstyle';
-import { SplitButtonPassThrough } from 'primeng/types/splitbutton';
-import { Bind } from 'primeng/bind';
 
 const SPLITBUTTON_INSTANCE = new InjectionToken<SplitButton>('SPLITBUTTON_INSTANCE');
 
@@ -321,7 +319,7 @@ export class SplitButton extends BaseComponent<SplitButtonPassThrough> {
      * @param {MouseEvent} event - Mouse event.
      * @group Emits
      */
-    @Output() onDropdownClick: EventEmitter<MouseEvent> = new EventEmitter<MouseEvent>();
+    @Output() onDropdownClick: EventEmitter<Event> = new EventEmitter<MouseEvent | KeyboardEvent>();
 
     @ViewChild('defaultbtn') buttonViewChild: ElementRef | undefined;
 
@@ -378,14 +376,14 @@ export class SplitButton extends BaseComponent<SplitButtonPassThrough> {
         this.menu?.hide();
     }
 
-    onDropdownButtonClick(event?: MouseEvent) {
+    onDropdownButtonClick(event: MouseEvent | KeyboardEvent) {
         this.onDropdownClick.emit(event);
-        this.menu?.toggle({ currentTarget: this.el?.nativeElement, relativeAlign: this.appendTo == null });
+        this.menu?.toggle({ currentTarget: this.el?.nativeElement, relatedTarget: event.currentTarget, relativeAlign: this.appendTo == null });
     }
 
     onDropdownButtonKeydown(event: KeyboardEvent) {
         if (event.code === 'ArrowDown' || event.code === 'ArrowUp') {
-            this.onDropdownButtonClick();
+            this.onDropdownButtonClick(event);
             event.preventDefault();
         }
     }
